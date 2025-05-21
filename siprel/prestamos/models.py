@@ -1,10 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+# Modelo genérico para listas de valores (ejemplo: tipos, categorías)
 class Maestra(models.Model):
+    #Texto para describir el valor
     descripcion= models.CharField(max_length=256, null=True)
+    #Numero entero que se puede asociar
     valor= models.IntegerField(null=True)
+    #Autoreferencia para crear jerarquías simples
     padre_fk= models.ForeignKey("self",on_delete=models.CASCADE, null=True)
+    
+    def __str__(self):
+        return self.descripcion #Muestra la descripción como texto
+    
+class Categoria(models.Model):
+    #Nombre de la categoría (ejemplo: PC's, Proyectores)
+    nombre = models.CharField(max_length=50)
+    #Descripcion opcional de la categoría
+    descripcion = models.CharField(blank=True)
+    
+    def __str__(self):
+        return self.nombre #Muestra el nombre del admin
 
 
 # Modelo Cliente: estudiantes o docentes
@@ -12,8 +28,8 @@ class Cliente(models.Model):
     identificacion = models.CharField(max_length=20, unique=True)
     nombre = models.CharField(max_length=100)
     correo = models.EmailField()
-    telefono = models.CharField(max_length=15)
-    direccion = models.TextField()
+    telefono = models.CharField(max_length=15, blank=True)
+    direccion = models.TextField(blank=True)
 
     TIPO_USUARIO = [
         ('estudiante', 'Estudiante'),
@@ -29,43 +45,60 @@ class Equipo(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     codigo_interno = models.CharField(max_length=50, unique=True)  # Ej. EQ-00123
-    estado = models.CharField(max_length=20, choices=[
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True) #Categoria
+    marca = models.CharField(max_length=50, blank=True) #Marca del equipo
+    modelo = models.CharField(max_length=50, blank=True) #Modelo del equipo
+    
+    # Estados posibles del equipo
+    ESTADO_CHOICES = [
         ('disponible', 'Disponible'),
         ('prestado', 'Prestado'),
         ('mantenimiento', 'En mantenimiento'),
-        ('dañado', 'Dañado'),
-    ], default='disponible')
+        ('danado', 'Dañado'),
+    ]
+    
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='disponible') #Estado actual
+
 
     def __str__(self):
-        return f"{self.nombre} - {self.codigo_interno}"
+        return f"{self.nombre} ({self.codigo_interno})" "Muestra nombre y codigo"
 
 # Modelo Prestamo: une clientes con equipos, registra fechas y estado
 class Prestamo(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='prestamos')
-    equipos = models.ManyToManyField(Equipo, related_name='prestamos')
-    fecha_prestamo = models.DateField(auto_now_add=True)
-    fecha_devolucion = models.DateField()
-    estado = models.CharField(max_length=20, choices=[
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE) #Cliente que toma prestados
+    equipos = models.ManyToManyField(Equipo) #Lista de equipos prestados
+    fecha_prestamo = models.DateField(auto_now_add=True) # Fecha de creación automática
+    fecha_devolucion = models.DateField()   # Fecha en la que debe devolverse
+    entregado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) #Quien registró
+    
+    # Estado del préstamo
+    ESTADO_CHOICES = [
         ('pendiente', 'Pendiente'),
+        ('aprobado', 'Aprobado'),
+        ('rechazado', 'Rechazado'),
         ('devuelto', 'Devuelto'),
-        ('retrasado', 'Retrasado'),
-    ], default='pendiente')
-    entregado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='prestamos_entregados')
+    ]
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+   
 
     def __str__(self):
-        return f"Préstamo #{self.id} - {self.cliente.nombre}"
+        return f"Préstamo #{self.id} - {self.cliente.nombre}" # Identificacion simple
 
 # Modelo Devolucion: registra estado final del equipo al ser devuelto
 class Devolucion(models.Model):
-    prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE, related_name='devoluciones')
-    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
-    fecha_devolucion = models.DateField(auto_now_add=True)
-    observaciones = models.TextField(blank=True, null=True)
-    estado_final = models.CharField(max_length=20, choices=[
+    prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE) # Préstamo al que pertenece
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE) #Equipo que se devuelve
+    fecha_devolucion = models.DateField(auto_now_add=True) # Fecha real de devolución
+    observaciones = models.TextField(blank=True, null=True) # Comentarios adicionales
+    
+    # Estado final del equipo
+    ESTADO_FINAL_CHOICES = [
         ('bueno', 'Bueno'),
-        ('dañado', 'Dañado'),
+        ('danado', 'Dañado'),
         ('faltante', 'Faltante'),
-    ])
+    ]
+    
+    estado_final = models.CharField(max_length=20, choices=ESTADO_FINAL_CHOICES)
 
     def __str__(self):
-        return f"Devolución de {self.equipo.nombre} - {self.estado_final}"
+        return f"Devolución de {self.id} - {self.equipo.codigo_interno}" # Texto de identificación
