@@ -13,16 +13,6 @@ class Maestra(models.Model):
     def __str__(self):
         return self.descripcion #Muestra la descripción como texto
     
-class Categoria(models.Model):
-    #Nombre de la categoría (ejemplo: PC's, Proyectores)
-    nombre = models.CharField(max_length=50)
-    #Descripcion opcional de la categoría
-    descripcion = models.CharField(blank=True)
-    
-    def __str__(self):
-        return self.nombre #Muestra el nombre del admin
-
-
 # Modelo Cliente: estudiantes o docentes
 class Cliente(models.Model):
     identificacion = models.CharField(max_length=20, unique=True)
