@@ -102,3 +102,15 @@ class Devolucion(models.Model):
 
     def __str__(self):
         return f"Devolución de {self.id} - {self.equipo.codigo_interno}" # Texto de identificación
+    
+# Nuevo modelo: Notificacion para alertas y recordatorios
+class Notificacion(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)     # Cliente destinatario de la notificación
+    prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE, null=True, blank=True)  # Préstamo relacionado (opcional)
+    mensaje = models.TextField()                                      # Contenido del mensaje
+    fecha_envio = models.DateTimeField(auto_now_add=True)             # Marca fecha y hora de envío
+    leida = models.BooleanField(default=False)                        # Indica si el cliente vio la notificación
+
+    def __str__(self):
+        estado = 'Leída' if self.leida else 'No leída'
+        return f"Notificación #{self.id} ({estado})"  # Breve descripción de la notificación
