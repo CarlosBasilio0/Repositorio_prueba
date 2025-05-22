@@ -35,7 +35,7 @@ class Equipo(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     codigo_interno = models.CharField(max_length=50, unique=True)  # Ej. EQ-00123
-    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True) #Categoria
+    categoria = models.ForeignKey(categoria, on_delete=models.SET_NULL, null=True, blank=True) #Categoria
     marca = models.CharField(max_length=50, blank=True) #Marca del equipo
     modelo = models.CharField(max_length=50, blank=True) #Modelo del equipo
     
