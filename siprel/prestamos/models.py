@@ -114,3 +114,13 @@ class Notificacion(models.Model):
     def __str__(self):
         estado = 'Leída' if self.leida else 'No leída'
         return f"Notificación #{self.id} ({estado})"  # Breve descripción de la notificación
+
+#nuevo modelo: Bitácora de Actividades (Logs)
+
+class Bitacora(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    accion = models.TextField()
+    fecha_hora = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.usuario.username if self.usuario else 'Sistema'} - {self.fecha_hora.strftime('%Y-%m-%d %H:%M:%S')}"
