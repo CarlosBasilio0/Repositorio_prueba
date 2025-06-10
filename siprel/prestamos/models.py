@@ -1,118 +1,101 @@
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 
-<<<<<<< HEAD
-=======
-# Modelo genérico para listas de valores (ejemplo: tipos, categorías)
-class Maestra(models.Model):
-    #Texto para describir el valor
-    descripcion= models.CharField(max_length=256, null=True)
-    #Numero entero que se puede asociar
-    valor= models.IntegerField(null=True)
-    #Autoreferencia para crear jerarquías simples
-    padre_fk= models.ForeignKey("self",on_delete=models.CASCADE, null=True)
-    
-    def __str__(self):
-        return self.descripcion #Muestra la descripción como texto 
-    
-class Categoria(models.Model):
-    #Nombre de la categoría (ejemplo: PC's, Proyectores)
-    nombre = models.CharField(max_length=50)
-    #Descripcion opcional de la categoría
-    descripcion = models.CharField(blank=True)
-    
-    def __str__(self):
-        return self.nombre #Muestra el nombre del admin
-
-    
-# Modelo Cliente: estudiantes o docentes
-class Cliente(models.Model):
-    identificacion = models.CharField(max_length=20, unique=True)
-    nombre = models.CharField(max_length=100)
-    correo = models.EmailField()
-    telefono = models.CharField(max_length=15, blank=True)
-    direccion = models.TextField(blank=True)
-
-    TIPO_USUARIO = [
-        ('estudiante', 'Estudiante'),
+# Modelo de Usuario
+class Usuario(AbstractUser):
+    ROLES = [
+        ('administrador', 'Administrador'),
         ('docente', 'Docente'),
+        ('estudiante', 'Estudiante'),
     ]
-    tipo = models.CharField(max_length=20, choices=TIPO_USUARIO)
+    rol = models.CharField(max_length=15, choices=ROLES)
+    
+    def __str__(self):
+        return f"{self.username} - {self.rol}"
+
+# Modelo de Categoría
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.nombre} ({self.tipo})"
+        return self.nombre
 
-# Modelo Equipo: lo que se presta (computadores, proyectores, batas, etc.)
+# Modelo de Ubicación
+class Ubicacion(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
+# Modelo de Equipo
 class Equipo(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    codigo_interno = models.CharField(max_length=50, unique=True)  # Ej. EQ-00123
-    categoria = models.ForeignKey("Categoria", on_delete=models.SET_NULL, null=True, blank=True)
-    marca = models.CharField(max_length=50, blank=True) #Marca del equipo
-    modelo = models.CharField(max_length=50, blank=True) #Modelo del equipo
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
+    ubicacion = models.ForeignKey(Ubicacion, on_delete=models.SET_NULL, null=True)
+    estado = models.CharField(max_length=20, choices=[('disponible', 'Disponible'), ('prestado', 'Prestado'), ('mantenimiento', 'En Mantenimiento')])
+    fecha_adquisicion = models.DateField()
     
-    # Estados posibles del equipo
-    ESTADO_CHOICES = [
-        ('disponible', 'Disponible'),
-        ('prestado', 'Prestado'),
-        ('mantenimiento', 'En mantenimiento'),
-        ('danado', 'Dañado'),
-    ]
-    
-    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='disponible') #Estado actual
-
-
     def __str__(self):
-        return f"{self.nombre} ({self.codigo_interno})" "Muestra nombre y codigo"
+        return f"{self.nombre} - {self.estado}"
 
-# Modelo Prestamo: une clientes con equipos, registra fechas y estado
+# Modelo de Préstamo
 class Prestamo(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE) #Cliente que toma prestados
-    equipos = models.ManyToManyField(Equipo) #Lista de equipos prestados
-    fecha_prestamo = models.DateField(auto_now_add=True) # Fecha de creación automática
-    fecha_devolucion = models.DateField()   # Fecha en la que debe devolverse
-    entregado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) #Quien registró
-    
-    # Estado del préstamo
-    ESTADO_CHOICES = [
-        ('pendiente', 'Pendiente'),
-        ('aprobado', 'Aprobado'),
-        ('rechazado', 'Rechazado'),
-        ('devuelto', 'Devuelto'),
-    ]
-    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
-   
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    fecha_prestamo = models.DateTimeField(auto_now_add=True)
+    fecha_devolucion = models.DateTimeField(null=True, blank=True)
+    estado = models.CharField(max_length=20, choices=[('pendiente', 'Pendiente'), ('devuelto', 'Devuelto')])
 
     def __str__(self):
-        return f"Préstamo #{self.id} - {self.cliente.nombre}" # Identificacion simple
+        return f"Prestamo: {self.equipo.nombre} a {self.usuario.username} - {self.estado}"
 
-# Modelo Devolucion: registra estado final del equipo al ser devuelto
-class Devolucion(models.Model):
-    prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE) # Préstamo al que pertenece
-    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE) #Equipo que se devuelve
-    fecha_devolucion = models.DateField(auto_now_add=True) # Fecha real de devolución
-    observaciones = models.TextField(blank=True, null=True) # Comentarios adicionales
-    
-    # Estado final del equipo
-    ESTADO_FINAL_CHOICES = [
-        ('bueno', 'Bueno'),
-        ('danado', 'Dañado'),
-        ('faltante', 'Faltante'),
-    ]
-    
-    estado_final = models.CharField(max_length=20, choices=ESTADO_FINAL_CHOICES)
+# Modelo de Historial de Préstamos
+class Historial(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    fecha_prestamo = models.DateTimeField()
+    fecha_devolucion = models.DateTimeField()
 
     def __str__(self):
-        return f"Devolución de {self.id} - {self.equipo.codigo_interno}" # Texto de identificación
-    
-# Nuevo modelo: Notificacion para alertas y recordatorios
+        return f"Historial: {self.equipo.nombre} - {self.usuario.username}"
+
+# Modelo de Mantenimiento
+class Mantenimiento(models.Model):
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    fecha_mantenimiento = models.DateTimeField(auto_now_add=True)
+    descripcion = models.TextField()
+    realizado_por = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Mantenimiento de {self.equipo.nombre} - {self.fecha_mantenimiento}"
+
+# Modelo de Sanción
+class Sancion(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    motivo = models.TextField()
+    fecha_inicio = models.DateTimeField(auto_now_add=True)
+    fecha_fin = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Sanción a {self.usuario.username} - {self.motivo}"
+
+# Modelo de Notificación
 class Notificacion(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)     # Cliente destinatario de la notificación
-    prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE, null=True, blank=True)  # Préstamo relacionado (opcional)
-    mensaje = models.TextField()                                      # Contenido del mensaje
-    fecha_envio = models.DateTimeField(auto_now_add=True)             # Marca fecha y hora de envío
-    leida = models.BooleanField(default=False)                        # Indica si el cliente vio la notificación
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    mensaje = models.TextField()
+    fecha_envio = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        estado = 'Leída' if self.leida else 'No leída'
-        return f"Notificación #{self.id} ({estado})"  # Breve descripción de la notificación
+        return f"Notificación a {self.usuario.username}"
 
->>>>>>> f6f67bbccd405ad19a4d9095cd60806546323a05
+# Modelo de Reporte
+class Reporte(models.Model):
+    fecha_generacion = models.DateTimeField(auto_now_add=True)
+    contenido = models.TextField()
+
+    def __str__(self):
+        return f"Reporte generado el {self.fecha_generacion}"
