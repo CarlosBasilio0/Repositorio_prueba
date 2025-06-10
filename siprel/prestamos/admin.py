@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Categoria, Maestra, Equipo, Prestamo, Devolucion, Notificacion
+from .models import Usuario, Equipo, Prestamo, Historial, Notificacion, Categoria, Ubicacion, Mantenimiento, Sancion, Reporte
 
 # Registrar los modelos en el admin de Django
 admin.site.register(Usuario)
