@@ -1,6 +1,6 @@
-from django.db import models
-from django.contrib.auth.models import User
 
+<<<<<<< HEAD
+=======
 # Modelo genérico para listas de valores (ejemplo: tipos, categorías)
 class Maestra(models.Model):
     #Texto para describir el valor
@@ -45,7 +45,7 @@ class Equipo(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     codigo_interno = models.CharField(max_length=50, unique=True)  # Ej. EQ-00123
-    categoria = models.ForeignKey(categoria, on_delete=models.SET_NULL, null=True, blank=True) #Categoria
+    categoria = models.ForeignKey("Categoria", on_delete=models.SET_NULL, null=True, blank=True)
     marca = models.CharField(max_length=50, blank=True) #Marca del equipo
     modelo = models.CharField(max_length=50, blank=True) #Modelo del equipo
     
@@ -114,3 +114,5 @@ class Notificacion(models.Model):
     def __str__(self):
         estado = 'Leída' if self.leida else 'No leída'
         return f"Notificación #{self.id} ({estado})"  # Breve descripción de la notificación
+
+>>>>>>> f6f67bbccd405ad19a4d9095cd60806546323a05
