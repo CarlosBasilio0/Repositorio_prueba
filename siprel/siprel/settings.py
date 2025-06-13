@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'prestamos',
+<<<<<<< HEAD
+=======
+   
+
+
+>>>>>>> 424d02f (Actualización del proyecto con nuevas migraciones y modelos)
 ]
 
 

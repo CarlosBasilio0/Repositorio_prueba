@@ -28,7 +28,26 @@ class PerfilUsuario(models.Model):
 # 3. Categoría de equipos
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
+<<<<<<< HEAD
     descripcion = models.TextField(blank=True)
+=======
+    descripcion = models.TextField()
+    codigo_interno = models.CharField(max_length=50, unique=True)  # Ej. EQ-00123
+    categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True, blank=True)
+    marca = models.CharField(max_length=50, blank=True) #Marca del equipo
+    modelo = models.CharField(max_length=50, blank=True) #Modelo del equipo
+    
+    # Estados posibles del equipo
+    ESTADO_CHOICES = [
+        ('disponible', 'Disponible'),
+        ('prestado', 'Prestado'),
+        ('mantenimiento', 'En mantenimiento'),
+        ('danado', 'Dañado'),
+    ]
+    
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='disponible') #Estado actual
+
+>>>>>>> 424d02f (Actualización del proyecto con nuevas migraciones y modelos)
 
     def __str__(self):
         return self.nombre

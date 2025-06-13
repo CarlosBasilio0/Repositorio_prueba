@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from .models import *
 from .serializers import *
 
+<<<<<<< HEAD
 
 def inicio(request):
     return render(request, 'inicio.html')  # asegúrate de que el archivo 'inicio.html' exista en tus templates
@@ -79,3 +80,8 @@ class AuditoriaViewSet(viewsets.ModelViewSet):
 class SoporteViewSet(viewsets.ModelViewSet):
     queryset = Soporte.objects.all()
     serializer_class = SoporteSerializer
+=======
+def inicio(request):
+    return render(request, 'inicio.html')  # asegúrate de que el archivo 'inicio.html' exista en tus templates
+
+>>>>>>> 424d02f (Actualización del proyecto con nuevas migraciones y modelos)
