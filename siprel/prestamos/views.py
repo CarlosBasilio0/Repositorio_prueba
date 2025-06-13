@@ -1,14 +1,27 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework import viewsets
 from django.contrib.auth.models import User
 from .models import *
 from .serializers import *
+from .forms import SolicitudPublicaForm  # nuevo import
 
-<<<<<<< HEAD
-
+# Vista pública
 def inicio(request):
-    return render(request, 'inicio.html')  # asegúrate de que el archivo 'inicio.html' exista en tus templates
+    return render(request, 'inicio.html')
 
+def solicitud_publica(request):
+    if request.method == 'POST':
+        form = SolicitudPublicaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request, 'solicitud_exitosa.html')  # plantilla que haremos en el paso 5
+    else:
+        form = SolicitudPublicaForm()
+
+    return render(request, 'solicitud_publica.html', {'form': form})
+
+
+# Vistas del API REST
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -80,8 +93,3 @@ class AuditoriaViewSet(viewsets.ModelViewSet):
 class SoporteViewSet(viewsets.ModelViewSet):
     queryset = Soporte.objects.all()
     serializer_class = SoporteSerializer
-=======
-def inicio(request):
-    return render(request, 'inicio.html')  # asegúrate de que el archivo 'inicio.html' exista en tus templates
-
->>>>>>> 424d02f (Actualización del proyecto con nuevas migraciones y modelos)

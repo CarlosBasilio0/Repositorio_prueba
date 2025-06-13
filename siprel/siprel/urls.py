@@ -26,6 +26,10 @@ router.register(r'soporte', SoporteViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.inicio, name='inicio'),  # vista de inicio
-    path('api/', include(router.urls)),      # todas las rutas de la API
+    path('', views.inicio, name='inicio'),  # ya existente
+     # 🔽 NUEVA RUTA PARA SOLICITUD PÚBLICA
+    path('solicitar/', views.solicitud_publica, name='solicitud_publica'),
+    path('api/', include(router.urls)),      # ya existente
+
+   
 ]

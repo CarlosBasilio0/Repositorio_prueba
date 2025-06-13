@@ -38,3 +38,8 @@ admin.site.register(EstadoEquipo)
 admin.site.register(Reserva)
 admin.site.register(EvaluacionPrestamo)
 admin.site.register(Soporte)
+
+from django.contrib import admin
+from .models import Solicitud
+
+admin.site.register(Solicitud)

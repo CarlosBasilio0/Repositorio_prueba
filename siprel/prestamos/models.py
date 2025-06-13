@@ -28,30 +28,25 @@ class PerfilUsuario(models.Model):
 # 3. Categoría de equipos
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
-<<<<<<< HEAD
     descripcion = models.TextField(blank=True)
-=======
-    descripcion = models.TextField()
-    codigo_interno = models.CharField(max_length=50, unique=True)  # Ej. EQ-00123
-    categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True, blank=True)
-    marca = models.CharField(max_length=50, blank=True) #Marca del equipo
-    modelo = models.CharField(max_length=50, blank=True) #Modelo del equipo
-    
-    # Estados posibles del equipo
+    codigo_interno = models.CharField(max_length=50, unique=True)
+    categoria = models.ForeignKey('Categoria', on_delete=models.SET_NULL, null=True, blank=True, related_name='subcategorias')
+    marca = models.CharField(max_length=50, blank=True)
+    modelo = models.CharField(max_length=50, blank=True)
+
     ESTADO_CHOICES = [
         ('disponible', 'Disponible'),
         ('prestado', 'Prestado'),
         ('mantenimiento', 'En mantenimiento'),
         ('danado', 'Dañado'),
     ]
-    
-    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='disponible') #Estado actual
 
->>>>>>> 424d02f (Actualización del proyecto con nuevas migraciones y modelos)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='disponible')
 
     def __str__(self):
         return self.nombre
 
+    
 # 4. Laboratorio
 class Laboratorio(models.Model):
     nombre = models.CharField(max_length=100)
@@ -196,3 +191,14 @@ class Soporte(models.Model):
 
     def __str__(self):
         return f"Soporte · {self.usuario.username}"
+
+from django.db import models
+
+class Solicitud(models.Model):
+    nombre = models.CharField(max_length=100)
+    correo = models.EmailField()
+    descripcion = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre
