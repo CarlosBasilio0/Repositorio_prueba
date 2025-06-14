@@ -14,12 +14,14 @@ def solicitud_publica(request):
         form = SolicitudPublicaForm(request.POST)
         if form.is_valid():
             form.save()
-            return render(request, 'solicitud_exitosa.html')  # plantilla que haremos en el paso 5
+            return redirect('solicitud_exitosa')  # <-- CAMBIADO AQUÍ
     else:
         form = SolicitudPublicaForm()
 
     return render(request, 'solicitud_publica.html', {'form': form})
 
+def solicitud_exitosa(request):
+    return render(request, 'solicitud_exitosa.html')  # <-- NUEVA FUNCIÓN AQUÍ
 
 # Vistas del API REST
 class UserViewSet(viewsets.ModelViewSet):
