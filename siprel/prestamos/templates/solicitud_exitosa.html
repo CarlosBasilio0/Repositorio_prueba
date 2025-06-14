@@ -1,4 +1,26 @@
+{% extends "base.html" %}
 {% load static %}
+
+{% block title %}¡Solicitud enviada! | SIPREL-UG{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card glass-card p-3 text-center">
+      <div class="card-body">
+        <h3 class="card-title text-success">¡Solicitud enviada con éxito!</h3>
+        <p class="card-text">Gracias por tu solicitud. La gestionaremos pronto.</p>
+        <a href="{% url 'inicio' %}" class="btn btn-primary me-2">Ir al inicio</a>
+        <a href="{% url 'admin:prestamos_solicitud_changelist' %}" 
+           class="btn btn-outline-secondary">
+          Ver en Admin
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

@@ -1,4 +1,30 @@
+{% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Enviar solicitud | SIPREL-UG{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height:60vh;">
+  <div class="glass-card p-4">
+    <h2 class="text-center mb-4">Enviar solicitud</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field|add_class:"form-control" }}
+          {% if field.errors %}
+            <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-dark w-100">Enviar solicitud</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -39,33 +65,22 @@
         }
 
         .form-group {
-            position: relative;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            color: #333;
+            border-radius: 12px;
+            border: 1px solid #bbb;
+            padding: 10px 15px;
             font-size: 1rem;
-            padding: 10px;
-            box-shadow: none;
+            background-color: rgba(255, 255, 255, 0.95);
         }
 
         .form-control:focus {
-            border: 1px solid #888;
-            background: white;
-            color: #111;
-            outline: none;
+            border-color: #666;
+            box-shadow: none;
         }
 
-        .form-label {
-            color: #333;
-            font-weight: 500;
-            margin-bottom: 5px;
-            display: block;
-        }
 
         .btn-submit {
             width: 100%;
@@ -81,9 +96,10 @@
             background: #555;
         }
 
-        textarea.form-control {
-            height: 100px;
-            resize: none;
+        label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #333;
         }
     </style>
 </head>
@@ -95,8 +111,11 @@
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
-                    <label class="form-label">{{ field.label }}</label>
-                    {{ field }}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field|add_class:"form-control" }}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                    {% endif %}
                 </div>
             {% endfor %}
             <button type="submit" class="btn btn-submit mt-3">Enviar solicitud</button>

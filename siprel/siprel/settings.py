@@ -10,12 +10,14 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
+    'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'rest_framework',
     'prestamos',
 ]
@@ -77,6 +79,8 @@ USE_TZ = True
 
 # Archivos estáticos
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 # Tipo de ID por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

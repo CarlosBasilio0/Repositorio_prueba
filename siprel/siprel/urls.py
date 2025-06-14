@@ -25,6 +25,7 @@ router.register(r'auditorias', AuditoriaViewSet)
 router.register(r'soporte', SoporteViewSet)
 
 urlpatterns = [
+    path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
     path('', views.inicio, name='inicio'),  # ya existente
     # 🔽 NUEVA RUTA PARA SOLICITUD PÚBLICA
@@ -34,3 +35,6 @@ urlpatterns = [
 
    
 ]
+
+# Configuración de django-grappelli
+GRAPPELLI_ADMIN_TITLE = "SIPREL-UG • Panel de Control"

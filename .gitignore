@@ -16,3 +16,9 @@ db.sqlite3
 *.bak
 .DS_Store
 Thumbs.db
+
+#Archivos estáticos
+staticfiles
+
+db.sqlite3
+
